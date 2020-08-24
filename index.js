@@ -48,7 +48,7 @@ async function main() {
     });
     psbt.addOutput({
         script: outputScript,
-        value: ((utxo.value * 1e8 | 1) - 1000)  // in sat
+        value: ((utxo.value * 1e8 | 1) - 1000)  // in sat (1000sat tx fee)
     });
     psbt.signInput(0, sk[0]);
     psbt.validateSignaturesOfInput(0);
@@ -57,7 +57,7 @@ async function main() {
 
     // broadcast the funding tx
     const fundingTxHash = await rpc.sendRawTransaction(fundingTxHex);
-    console.log(fundingTxHash);
+    console.log({fundingTxHash});
 
     // mine one block. confirm the tx.
     await rpc.generateToAddress(1, addr[0]);
@@ -75,7 +75,7 @@ async function main() {
     })
     p2msPsbt.addOutput({
         address: addr[1],
-        value: ((utxo.value * 1e8 | 1) - 2000)  // in sat
+        value: ((utxo.value * 1e8 | 1) - 2000)  // in sat (2000sat tx fee)
     });
     // sign the spending tx
     p2msPsbt.signInput(0, sk[0]);   // sign with key 0
@@ -87,7 +87,7 @@ async function main() {
     const p2msSpendingTx = p2msPsbt.extractTransaction().toHex();
 
     const spendingTxHash = await rpc.sendRawTransaction(p2msSpendingTx);
-    console.log(spendingTxHash);
+    console.log({spendingTxHash});
 }
 
 try { main(); } catch(e) { console.error(e); process.exit(-1) };
